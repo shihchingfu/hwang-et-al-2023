@@ -1,0 +1,128 @@
+---
+format: revealjs
+self-contained: true
+---
+
+## 
+
+![<https://dx.doi.org/10.1088/1475-7516/2023/02/014>](figures/title-abstract.png)
+
+## Summary
+
+- Gaussian processes (GPs) have two components, mean function and kernel function.
+- Often the focus is put on the kernel function and the mean function assumed to be zero.
+- Use the calculation of distance moduli of Type Ia supernovae as example.
+- Arbitrary choice of mean function can lead to unphysical results.
+- Marginalise over a family of mean functions to remove the effect of this choice.
+
+## GP Notation
+
+For data $\{(\boldsymbol{x}_i, y_i); i = 1, \ldots, N\}$ with $\boldsymbol{x}_i \in \mathbb{R}^d$ and $y_i \in \mathbb{R}$,
+
+$$y_i = f(\boldsymbol{x}_i) + \varepsilon_i$$
+
+We propose a underlying function,
+
+$$f(\cdot) \sim\mathcal{MVN} \left( \mu(\boldsymbol{x};\boldsymbol\theta_\mu), k(\boldsymbol{x}, \boldsymbol{x'}; \boldsymbol{\theta}_k) \right)$$
+
+where $\mu(\cdot)$ is the mean function and $k(\cdot)$ is the covariance kernel function, with hyperparameters $\boldsymbol\theta_\mu$ and $\boldsymbol\theta_k$, respectively.
+
+## Mean Function
+
+If we were to take many realisations of a GP, the mean of these over the support would be the specified mean function.
+
+For example, $\mu(x) = \boldsymbol{0}$, $k(x, x') =  \exp\{-\|x - x'\|^2\}$:
+
+```{r}
+library(plgp)
+library(scales)
+
+n_observations <- 100
+upper_limit <- 1000
+n_realisations <- 50
+
+X <- matrix(seq(1, upper_limit, length = n_observations), ncol = 1)
+D <- plgp::distance(X) # squared euclidean distances
+eps <- 1e-8
+
+Sigma <- exp(-D) + diag(eps, n_observations) # covariance matrix + jitter
+
+set.seed(1)
+Y <- rmvnorm(n_realisations, sigma = Sigma)
+Ymean <- colMeans(Y)
+
+matplot(X, t(Y), type = "l", ylab = "Y", main = "40 realisations")
+lines(X, Ymean, col = "orange", lwd=5)
+```
+
+## GP Regression
+
+\begin{matrix}
+y \\
+f^*
+\end{matrix}
+
+. . .
+
+The reconstruction $f^*$ is dependent on the choice of $\mu^*$.
+. . .
+
+We actually want the reconstruction conditioned on observations, $y$
+
+$$f^* | y \sim \mathcal{MVN}(\bar{f^*}, \mathrm{Cov}(f^*))$$
+
+## Data
+
+- Pantheon SNIa compilation contains 1048 points upto $z \simeq 2.3$.
+- Mock data based on Pantheon with added Gaussian white noise.
+- Two models for comparison
+    - phenomenologically emergent dark energy (PEDE) model,
+    - Chevellier-Polarski-Linder (CPL) parameterisation of DE equation of state
+
+## 
+
+![](figures/figure01.png)
+
+## Method
+
+Apply GP regression with
+
+1. Different mean functions
+
+  - Zero
+
+  - Best fit
+
+2. Different kernel functions
+
+  - Squared Exponential
+
+  - Matern 3/2
+
+3. Marginalise over different mean functions
+  
+## Results: Zero mean function
+
+<center>![](figures/figure02.png){width=70%}</center>
+
+
+## Results: Best-fit mean function
+
+<center>![](figures/figure03.png){width=70%}</center>
+
+## Results: Best-fit mean function
+
+<center>![](figures/figure04.png){width=70%}</center>
+
+## Conclusions of Paper {.small}
+
+- Choice of mean function should not be arbitrary but carefully selected.
+- Don't use zero mean function for non-stationary quantities.
+- Full marginalisation does not seem to be too sensitive to choice of family of mean functions.
+
+## Comments
+
+- Marginalisation is common practice, but model misspecification is still a risk.
+- There is a computational cost, especially for more complex families of functions.
+  - use GPs for the mean function?!
+- Alternative ways to prevent "unphysical" reconstructions, e.g., constraints on priors, transformations, etc.
