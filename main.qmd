@@ -5,15 +5,21 @@ self-contained: true
 
 ## 
 
-![<https://dx.doi.org/10.1088/1475-7516/2023/02/014>](figures/title-abstract.png)
+![](figures/title-authors.png)
+
+<https://dx.doi.org/10.1088/1475-7516/2023/02/014>
+
+##
+
+![](figures/abstract.png)
 
 ## Summary
 
 - Gaussian processes (GPs) have two components, mean function and kernel function.
 - Often the focus is put on the kernel function and the mean function assumed to be zero.
-- Use the calculation of distance moduli of Type Ia supernovae as example.
 - Arbitrary choice of mean function can lead to unphysical results.
-- Marginalise over a family of mean functions to remove the effect of this choice.
+- Example: calculation of distance moduli of Type Ia supernovae under two cosmological models.
+- Marginalise over a family of mean functions to remove the effect of mean function choice.
 
 ## GP Notation
 
@@ -31,9 +37,9 @@ where $\mu(\cdot)$ is the mean function and $k(\cdot)$ is the covariance kernel 
 
 If we were to take many realisations of a GP, the mean of these over the support would be the specified mean function.
 
-For example, $\mu(x) = \boldsymbol{0}$, $k(x, x') =  \exp\{-\|x - x'\|^2\}$:
+For example, $\mu(\boldsymbol{x}) = \boldsymbol{0}$, $k(x, x') =  \exp\{-\|x - x'\|^2\}$:
 
-```{r}
+```{r fig.align='center'}
 library(plgp)
 library(scales)
 
