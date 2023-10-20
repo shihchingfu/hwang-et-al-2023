@@ -61,7 +61,7 @@ matplot(X, t(Y), type = "l", ylab = "Y", main = "40 realisations")
 lines(X, Ymean, col = "orange", lwd=5)
 ```
 
-## Conditional Distribution
+## GP Regression
 
 $$
   \left[ {\begin{array}{c} \boldsymbol{y}\\ \boldsymbol{f^*}\\
@@ -73,27 +73,28 @@ where $\boldsymbol{x}$ are observed points whose values are $\boldsymbol{y}$, an
 
 . . .
 
-The reconstruction $\boldsymbol{f^*}$ is dependent on the choice of $\boldsymbol{\mu^*}$.
+The reconstruction $\boldsymbol{f^*}$ is dependent on the choice of $\boldsymbol{\mu^*}$ and $k(\cdot)$ which themselves have hyperparameters $\boldsymbol{\theta}$.
 
-. . .
+## Conditional Distribution
 
 We actually want the reconstruction conditioned on observations, $\boldsymbol{y}$.
 
-$$\boldsymbol{f^*} | \boldsymbol{y} \sim \mathcal{MVN}(\boldsymbol{\bar{f^*}}, \mathrm{Cov}(\boldsymbol{f^*}))$$
+$$\boldsymbol{f^*} \vert \; \boldsymbol{y} \sim \mathcal{MVN}(\boldsymbol{\bar{f^*}}, \mathrm{Cov}(\boldsymbol{f^*}))$$
 
-## Chain Rule & Marginalisation
+## Chain Rule & Marginalisation 
 
-Joint probabilities can be expressed as conditional probabilities:
+Joint probabilities expressed as conditional probabilities:
 
 $$P(A, B) = P(A|B) \times P(B)$$
 
 $$P(A,B | C) = P(A|B,C) \times P(B|C)$$
 
-. . .
-
 Variables can be "integrated out":
 
-$$P(X) = \int_y P(X, Y = y) dy$$
+\begin{align}
+P(X) = &\int_y P(X, Y = y) \mathrm{d}y\\
+ = & \int_y P(X \vert Y = y) \times P(Y = y) \mathrm{d}y
+\end{align}
 
 
 ## GP Regression
@@ -102,13 +103,17 @@ Marginal likelihood of conditional distribution
 
 $$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) = \int p(\boldsymbol{y}|\boldsymbol{f}, \boldsymbol{x}) \times p(\boldsymbol{f}|\boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) \;d\boldsymbol{f}$$
 
+We can choose values for $\mu$ and $\theta$ that maximise this quantity to get the "best fit" Gaussian process.
+
+There are sometimes analytical solutions for this.
+
 ## Data
 
 - Pantheon SNIa compilation contains 1048 points upto $z \simeq 2.3$.
 - Mock data based on Pantheon with added Gaussian white noise.
 - Two models for comparison
-    - phenomenologically emergent dark energy (PEDE) model,
-    - Chevellier-Polarski-Linder (CPL) parameterisation of DE equation of state
+    - Phenomenologically emergent dark energy (PEDE) model, and
+    - Chevellier-Polarski-Linder (CPL) parameterisation of DE equation of state.
 
 ## 
 
@@ -119,38 +124,63 @@ $$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) = 
 Apply GP regression with
 
 1. Different mean functions
-  - Zero
-  - Best fit
-
+    - Zero
+    - "Best fit"
 2. Different kernel functions
-  - Squared Exponential
-  - Matern 3/2
-
+    - Squared Exponential
+    - Matern 3/2
 3. Marginalise over different mean functions
 
 
 ## Results: Zero mean function
 
-<center>![](figures/figure02.png){width=70%}</center>
+<center>![](figures/figure02.png){width=100%}</center>
 
 
-## Results: Best-fit mean function
+## Results: Marginal Likelihood {.smaller}
 
-<center>![](figures/figure03.png){width=70%}</center>
+$$k(x, x'; \sigma_f, \ell) = \sigma_f^2 \exp\left\{-\frac{1}{2}\left( \frac{x - x'}{\ell}\right)^2\right\}\qquad \eta, \ell \gt 0$$
 
-## Results: Best-fit mean function
+<center>![](figures/figure03.png){width=80%}</center>
+
+## A Choice 
+
+1. Find the "best" hyperparameter settings by optimising the marginal likelihood.
+$$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) = \int p(\boldsymbol{y}|\boldsymbol{f}, \boldsymbol{x}) \times p(\boldsymbol{f}|\boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) \;d\boldsymbol{f}$$
+
+2. Marginalise over all values of hyperparameters to remove their effects.
+$$p(\boldsymbol{y} \vert \boldsymbol{x}, \boldsymbol{\mu}) = \iint p(\boldsymbol{y} \vert \boldsymbol{f}, \boldsymbol{x})\, p(\boldsymbol{f}\vert \boldsymbol{x}, \boldsymbol{\theta}) \mathrm{d}\boldsymbol{f}\mathrm{d}\boldsymbol\theta$$
+
+##
 
 <center>![](figures/figure04.png){width=70%}</center>
+
+## Results: Full-marginalisation
+
+$$p(\boldsymbol{y} \vert \boldsymbol{x}) = \iiint p(\boldsymbol{y} \vert \boldsymbol{f}, \boldsymbol{x})\, p(\boldsymbol{f}\vert \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}) \mathrm{d}\boldsymbol{f}\mathrm{d}\boldsymbol\theta\mathrm{d}\boldsymbol\mu$$
+
+<center>![](figures/figure05.png){width=65%}</center>
+
+## Different kernels
+
+<center>![](figures/figure06.png){width=90%}</center>
+
+## Bias
+
+<center>![](figures/figure07.png){width=60%}</center>
 
 ## Conclusions of Paper {.small}
 
 - Choice of mean function should not be arbitrary but carefully selected.
 - Don't use zero mean function for non-stationary quantities.
 - Full marginalisation does not seem to be too sensitive to choice of family of mean functions.
+- Difference between Squared Exponential and Matern kernels is negligible.
 
 ## Comments
 
+- Unsurprising but reassuring result.
 - Marginalisation is common practice, but model misspecification is still a risk.
 - There is a computational cost, especially for more complex families of functions.
   - use GPs for the mean function?!
 - Alternative ways to prevent "unphysical" reconstructions, e.g., constraints on priors, transformations, etc.
+- Comparing derivatives is very challenging.
