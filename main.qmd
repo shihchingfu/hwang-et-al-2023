@@ -57,10 +57,13 @@ lines(X, Ymean, col = "orange", lwd=5)
 
 ## GP Regression
 
-\begin{matrix}
-y \\
-f^*
-\end{matrix}
+$$
+  \left[ {\begin{array}{c} \boldsymbol{y}\\ \boldsymbol{f^*}\\
+  \end{array} } \right] \sim \mathcal{N} \left(\left[ \begin{array}{c} \boldsymbol{\mu}\\ \boldsymbol{\mu^*} \\ 
+  \end{array} \right], \left[ \begin{array}{cc} k(\boldsymbol{x}, \boldsymbol{x})& k(\boldsymbol{x}, \boldsymbol{x^*})\\ k(\boldsymbol{x^*}, \boldsymbol{x}) & k(\boldsymbol{x^*}, \boldsymbol{x^*}) \\\end{array}\right] \right)
+$$
+
+where $\boldsymbol{x}$ are observed points whose values are $\boldsymbol{y}$, and $\boldsymbol{x^*}$ are target points with predicted values $\boldsymbol{f^*}$.
 
 . . .
 
@@ -70,7 +73,11 @@ The reconstruction $f^*$ is dependent on the choice of $\mu^*$.
 
 We actually want the reconstruction conditioned on observations, $y$
 
-$$f^* | y \sim \mathcal{MVN}(\bar{f^*}, \mathrm{Cov}(f^*))$$
+$$\boldsymbol{f^*} | \boldsymbol{y} \sim \mathcal{MVN}(\boldsymbol{\bar{f^*}}, \mathrm{Cov}(\boldsymbol{f^*}))$$
+
+## Regression
+
+$$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta})_k = \int p(\boldsymbol{y}|\boldsymbol{f}, \boldsymbol{x}) \times p(\boldsymbol{f}|\boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}) \;d\boldsymbol{f}$$
 
 ## Data
 
