@@ -61,29 +61,46 @@ matplot(X, t(Y), type = "l", ylab = "Y", main = "40 realisations")
 lines(X, Ymean, col = "orange", lwd=5)
 ```
 
-## GP Regression
+## Conditional Distribution
 
 $$
   \left[ {\begin{array}{c} \boldsymbol{y}\\ \boldsymbol{f^*}\\
   \end{array} } \right] \sim \mathcal{N} \left(\left[ \begin{array}{c} \boldsymbol{\mu}\\ \boldsymbol{\mu^*} \\ 
-  \end{array} \right], \left[ \begin{array}{cc} k(\boldsymbol{x}, \boldsymbol{x})& k(\boldsymbol{x}, \boldsymbol{x^*})\\ k(\boldsymbol{x^*}, \boldsymbol{x}) & k(\boldsymbol{x^*}, \boldsymbol{x^*}) \\\end{array}\right] \right)
+  \end{array} \right], \left[ \begin{array}{cc} k(\boldsymbol{x}, \boldsymbol{x}) + C& k(\boldsymbol{x}, \boldsymbol{x^*})\\ k(\boldsymbol{x^*}, \boldsymbol{x}) & k(\boldsymbol{x^*}, \boldsymbol{x^*}) \\\end{array}\right] \right)
 $$
 
 where $\boldsymbol{x}$ are observed points whose values are $\boldsymbol{y}$, and $\boldsymbol{x^*}$ are target points with predicted values $\boldsymbol{f^*}$.
 
 . . .
 
-The reconstruction $f^*$ is dependent on the choice of $\mu^*$.
+The reconstruction $\boldsymbol{f^*}$ is dependent on the choice of $\boldsymbol{\mu^*}$.
 
 . . .
 
-We actually want the reconstruction conditioned on observations, $y$
+We actually want the reconstruction conditioned on observations, $\boldsymbol{y}$.
 
 $$\boldsymbol{f^*} | \boldsymbol{y} \sim \mathcal{MVN}(\boldsymbol{\bar{f^*}}, \mathrm{Cov}(\boldsymbol{f^*}))$$
 
-## Regression
+## Chain Rule & Marginalisation
 
-$$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta})_k = \int p(\boldsymbol{y}|\boldsymbol{f}, \boldsymbol{x}) \times p(\boldsymbol{f}|\boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}) \;d\boldsymbol{f}$$
+Joint probabilities can be expressed as conditional probabilities:
+
+$$P(A, B) = P(A|B) \times P(B)$$
+
+$$P(A,B | C) = P(A|B,C) \times P(B|C)$$
+
+. . .
+
+Variables can be "integrated out":
+
+$$P(X) = \int_y P(X, Y = y) dy$$
+
+
+## GP Regression
+
+Marginal likelihood of conditional distribution
+
+$$p(\boldsymbol{y} | \boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) = \int p(\boldsymbol{y}|\boldsymbol{f}, \boldsymbol{x}) \times p(\boldsymbol{f}|\boldsymbol{x}, \boldsymbol{\mu}, \boldsymbol{\theta}_k) \;d\boldsymbol{f}$$
 
 ## Data
 
@@ -111,19 +128,6 @@ Apply GP regression with
 
 3. Marginalise over different mean functions
 
-## Chain Rule & Marginalisation
-
-Joint probabilities can be expressed as conditional probabilities:
-
-$$P(A, B) = P(A|B) \times P(B)$$
-
-$$P(A,B | C) = P(A|B,C) \times P(B|C)$$
-
-. . .
-
-Variables can be "integrated out":
-
-$$P(X) = \int_y P(X, Y = y) dy$$
 
 ## Results: Zero mean function
 
