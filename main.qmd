@@ -65,6 +65,7 @@ f^*
 . . .
 
 The reconstruction $f^*$ is dependent on the choice of $\mu^*$.
+
 . . .
 
 We actually want the reconstruction conditioned on observations, $y$
@@ -88,19 +89,29 @@ $$f^* | y \sim \mathcal{MVN}(\bar{f^*}, \mathrm{Cov}(f^*))$$
 Apply GP regression with
 
 1. Different mean functions
-
   - Zero
-
   - Best fit
 
 2. Different kernel functions
-
   - Squared Exponential
-
   - Matern 3/2
 
 3. Marginalise over different mean functions
-  
+
+## Chain Rule & Marginalisation
+
+Joint probabilities can be expressed as conditional probabilities:
+
+$$P(A, B) = P(A|B) \times P(B)$$
+
+$$P(A,B | C) = P(A|B,C) \times P(B|C)$$
+
+. . .
+
+Variables can be "integrated out":
+
+$$P(X) = \int_y P(X, Y = y) dy$$
+
 ## Results: Zero mean function
 
 <center>![](figures/figure02.png){width=70%}</center>
